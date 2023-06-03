@@ -25,6 +25,7 @@ CREATE TABLE "Reviews" (
     "restaurantId" TEXT NOT NULL,
     "ratings" DOUBLE PRECISION NOT NULL,
     "description" TEXT NOT NULL,
+    "datetime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Reviews_pkey" PRIMARY KEY ("id")
 );
@@ -46,7 +47,10 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Restaurant_name_key" ON "Restaurant"("name");
+CREATE INDEX "User_email_idx" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Restaurant_name_location_key" ON "Restaurant"("name", "location");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Reviews_userId_restaurantId_key" ON "Reviews"("userId", "restaurantId");

@@ -8,6 +8,6 @@ export interface IUser {
 export interface IReview {
     userId: string
     restaurantId: string
-    rating: number
+    ratings: number
     description: string
 }

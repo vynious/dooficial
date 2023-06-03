@@ -10,7 +10,7 @@ export default class User {
     public static createUser = async (args: IUser) => {
         const {name, email, password, username} = args
         const hashedPassword = await hash(password);
-        const user = await prisma.user.create({ data: {
+        const user: IUser= await prisma.user.create({ data: {
             username: username,
             name: name,
             email :email,

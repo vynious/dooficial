@@ -41,6 +41,7 @@ model Reviews {
   restaurantId String
   ratings Float
   description String
+  datetime DateTime @default(now())
 
   @@unique([userId, restaurantId])
 }

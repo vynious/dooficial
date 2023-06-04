@@ -11,3 +11,9 @@ export interface IReview {
     ratings: number
     description: string
 }
+
+export interface IRestaurant {
+    name: string,
+    location: string,
+}
+

@@ -1,58 +1,14 @@
-
-
-export interface IUser {
-    userId: string,
-    name: string
-    username: string
-    email: string
-    password: string
+export interface dUser {
+    id: string,
+    name?: string,
+    email?: string,
+    username?: string,
+    password?: string,
+    iat?: number,
+    exp?: number
 }
 
-export interface PUser {
-    userId: string
+export function isUserObject(value: any): value is dUser {
+    return typeof value === 'object' && value !== null && !Buffer.isBuffer(value);
 }
-
-export interface PLogin {
-    password: string
-}
-
-export interface PUsername {
-    username: string
-} 
-
-
-
-
-
-
-export interface IReview {
-    userId: string
-    restaurantId: string
-    ratings: number
-    description: string
-}
-
-export interface PReview {
-    restaurantId: string,
-    ratings: number,
-    description: string
-}
-
-
-export interface PUserXRest {
-    userId: string,
-    restaurantId: string
-}
-
-
-
-
-
-export interface IRestaurant {
-    name: string,
-    location: string,
-}
-
-
-
-// params typing
+  

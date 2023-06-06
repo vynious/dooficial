@@ -4,8 +4,8 @@ import { hash } from "../utils/Hashing";
 import { FastifyRequest, FastifyReply } from "fastify";
 import { CreateUserInput, PasswordInput, UUIDInput, UserLoginInput, UsernameInput} from "schemas/UserSchema";
 import { Application } from "../App";
-
 import { isUserObject } from "../types/ModelTypes";
+import Logging from "../utils/Logging";
 
 const prisma = new PrismaClient();
  
@@ -28,32 +28,30 @@ export default class User {
                 email :email,
                 password: hashedPassword
             }})
-            console.log("successfully created -> ",user);
+            Logging.log(`successfully created -> ${user}`);
             reply.status(201).send(user);
         } catch (error) {
-            console.log(error);
+            Logging.error(error);
         }
     }
 
     public static loginUser = async (req: FastifyRequest<{Body: UserLoginInput}>, reply: FastifyReply) => {
         try {
             const {email, password} = req.body;
-            console.log(email, password);
             const user = await prisma.user.findUnique({
                 where: {
                     email: email
                 }
             });
-            console.log(user);
             if (user && await bcrypt.compare(password, user.password)) {
                 const accessToken = Application.jwt.sign(user, {expiresIn: "5m"});
-                console.log(accessToken)
+                Logging.log(accessToken)
                 reply.send({accessToken: accessToken})
             } else {
-                console.log(`${email} does not exist/password wrong`);
+                Logging.warn(`${email} does not exist/password wrong`);
             }
         } catch (error) {
-            console.log(error); 
+            Logging.error(error); 
         }
     }
 
@@ -72,16 +70,14 @@ export default class User {
                         }
                     })
                     if (updatedUserPassword) {
-                        console.log(`---successfully updated password for ${id}---`)
+                        Logging.log(`---successfully updated password for ${id}---`)
                         reply.status(201).send(updatedUserPassword)
                     } else {
-                        console.log("update password unsuccessful")
+                        Logging.warn("update password unsuccessful")
                     }
                 }
-
-                
         } catch (error) {
-            console.log(error)
+            Logging.error(error)
         }
         
     }
@@ -101,14 +97,14 @@ export default class User {
                     }
                 })
                 if (updatedUsername) {
-                    console.log(`successfully updated username to ${username}`)
+                    Logging.log(`successfully updated username to ${username}`)
                     reply.send(updatedUsername)
                 } else {
-                    console.log("update username unsuccessful");
+                    Logging.warn("update username unsuccessful");
                 }
             }
         } catch (error) {
-            console.log(error)
+            Logging.error(error)
         }
     }
 
@@ -139,11 +135,11 @@ export default class User {
                     }
                 })
                 await prisma.$transaction([deleteReviews, deleteFollowing, deleteFollowers, deleteUser])
-                console.log(`successfully deleted all tracers of ${id}`)
+                Logging.log(`successfully deleted all tracers of ${id}`)
             }
 
         } catch (error) {
-            console.log(error)
+            Logging.error(error)
         }
   
     }
@@ -151,12 +147,13 @@ export default class User {
     public static getUser = async (req: FastifyRequest<{}>, reply: FastifyReply) => {
         try {
             if (isUserObject(req.user)) {
+                Logging.log("successfully retrieved details")
                 reply.send(req.user)
             } else {
-                console.log("idk why the code will even make it here? because validation will settle")
+                Logging.warn("idk why the code will even make it here? because validation will settle")
             }
         } catch (error) {
-            console.log(error)
+            Logging.error(error)
         }
     }
 

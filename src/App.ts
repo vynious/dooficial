@@ -5,6 +5,7 @@ import { ReviewRoutes } from "./routes/ReviewRoutes";
 import { UserSchemas } from "./schemas/UserSchema";
 import fastifyjwt from "@fastify/jwt";
 import { isUserObject } from "./types/ModelTypes";
+import Logging from "./utils/Logging";
 
 
 dotenv.config();
@@ -37,10 +38,12 @@ const buildServer = async () => {
             const decodedUser = await req.jwtVerify();
             if (isUserObject(decodedUser)) {
                 req.user = decodedUser;
+                Logging.info("----JWT validated----")
             } else {
-                console.log("decoded user is not user object")
+                Logging.warn("decoded user is not user object")
             }  
         } catch (error) {
+            Logging.error(error)
             reply.send(error)
         } 
     })

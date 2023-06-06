@@ -20,9 +20,13 @@ export async function UserRoutes (Application: FastifyInstance)  {
         }
     }}, User.loginUser)
 
-    Application.get("/:id", 
-    {
-
+    Application.get("/profile", 
+    {   preHandler: [Application.authenticate],
+        schema: {
+            response: {
+                200: $ref("UserCoreSchema")
+            }
+        }
     }, User.getUser)
 
     Application.post("/password/update", 

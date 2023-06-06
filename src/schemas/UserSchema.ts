@@ -3,43 +3,79 @@ import { buildJsonSchemas } from "fastify-zod";
 
 
 // Input Validation for Users 
-  
-const CreateUserSchema = z.object({
-    name: z.string({
-        required_error: "Missing name",
-        invalid_type_error: "Only strings allowed"
-    }),
-    username: z.string({
-        required_error: "Missing username",
-        invalid_type_error: "Only strings allowed"
-    }),
-    email: z.string().email({ message: "Invalid Email Address" }),
+/*
+    This page needs some refractoring to make it neatier
+    too many redundant schemas that can be made concise.
+*/
+
+/// single field 
+const PasswordSchema = z.object({
     password: z.string().min(8, { message: "Minimum password length is 8" })
-  });
-  
-const CreateUserResponseSchema = z.object({
-    id: z.string(),
-    name: z.string({
-        required_error: "Missing name",
-        invalid_type_error: "Only strings allowed"
-    }),
+});
+
+const UsernameSchema = z.object({
     username: z.string({
         required_error: "Missing username",
         invalid_type_error: "Only strings allowed"
-    }),
+    })
+})
+
+const UUIDSChema = z.object({
+    id: z.string()
+})
+
+const EmailSchema = z.object({
     email: z.string().email({ message: "Invalid Email Address" })
 })
 
-const LoginSchema = z.object({
-    email: z.string().email({message: "Invalid email"}),
-    password: z.string()
+const NameSchema = z.object({
+    name: z.string({
+        required_error: "Missing name",
+        invalid_type_error: "Only strings allowed"
+    }),
 })
 
-const CreateLoginResponseSchema = z.object({
-    accessToken: z.string()
+const UserCoreSchema = z.object({
+    ...NameSchema.shape,
+    ...UsernameSchema.shape,
+    ...EmailSchema.shape,
 })
 
+const UserCreationSchema = z.object({
+    ...UserCoreSchema.shape,
+    ...PasswordSchema.shape
+})
+
+const UserSchema = z.object({
+    ...UUIDSChema.shape,
+    ...UserCreationSchema.shape
+})
+
+const UserLoginSchema = z.object({
+    ...EmailSchema.shape,
+    ...PasswordSchema.shape
+})
+
+///
+
+// used as interface for type casting user's inputs in req.body/params 
+export type CreateUserInput = z.infer<typeof UserCreationSchema>
+export type UserLoginInput = z.infer<typeof UserLoginSchema>
+export type PasswordInput = z.infer<typeof PasswordSchema>
+export type UsernameInput = z.infer<typeof UsernameSchema>
+export type EmailInput = z.infer<typeof EmailSchema>
+export type NameInput = z.infer<typeof NameSchema>
+export type UUIDInput = z.infer<typeof UUIDSChema>
 
 
-export type CreateUserInput = z.infer<typeof CreateUserSchema>
-export type UserLoginInput = z.infer<typeof LoginSchema>
+export const {schemas: UserSchemas, $ref } = buildJsonSchemas({
+    UUIDSChema,
+    NameSchema,
+    EmailSchema,
+    PasswordSchema,
+    UsernameSchema,
+    UserCoreSchema,
+    UserCreationSchema,
+    UserLoginSchema,
+    UserSchema,
+})

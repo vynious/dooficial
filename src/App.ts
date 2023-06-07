@@ -6,6 +6,7 @@ import { UserSchemas } from "./schemas/UserSchema";
 import fastifyjwt from "@fastify/jwt";
 import { isUserObject } from "./types/ModelTypes";
 import Logging from "./utils/Logging";
+import { FollowsRoutes } from "./routes/FollowsRoutes";
 
 
 dotenv.config();
@@ -47,7 +48,7 @@ const buildServer = async () => {
             reply.send(error)
         } 
     })
-
+    Application.register(FollowsRoutes, {prefix: "api/follows"})
     Application.register(UserRoutes, {prefix: "api/user"});
     Application.register(ReviewRoutes, {prefix: "api/review"});
 

@@ -20,7 +20,7 @@ const UsernameSchema = z.object({
     })
 })
 
-const UUIDSChema = z.object({
+const UUIDSchema = z.object({
     id: z.string()
 })
 
@@ -47,7 +47,7 @@ const UserCreationSchema = z.object({
 })
 
 const UserSchema = z.object({
-    ...UUIDSChema.shape,
+    ...UUIDSchema.shape,
     ...UserCreationSchema.shape
 })
 
@@ -69,11 +69,11 @@ export type PasswordInput = z.infer<typeof PasswordSchema>
 export type UsernameInput = z.infer<typeof UsernameSchema>
 export type EmailInput = z.infer<typeof EmailSchema>
 export type NameInput = z.infer<typeof NameSchema>
-export type UUIDInput = z.infer<typeof UUIDSChema>
+export type UUIDInput = z.infer<typeof UUIDSchema>
 export type IUser = z.infer<typeof UserSchema>
 
 export const {schemas: UserSchemas, $ref } = buildJsonSchemas({
-    UUIDSChema,
+    UUIDSchema,
     NameSchema,
     EmailSchema,
     PasswordSchema,

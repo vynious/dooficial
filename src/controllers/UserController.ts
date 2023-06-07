@@ -10,8 +10,13 @@ import Logging from "../utils/Logging";
 const prisma = new PrismaClient();
  
 /*
-Type Casting Inputs -> Which to use, How to efficiently do it ?? 
--- refer to schema page for refractoring then use the refractored.
+-- functionality for users --
+1. register user
+2. login user 
+3. update username
+4. update password
+5. delete user account
+6. read user details 
 */
 
 
@@ -45,7 +50,7 @@ export default class User {
             });
             if (user && await bcrypt.compare(password, user.password)) {
                 const accessToken = Application.jwt.sign(user, {expiresIn: "5m"});
-                Logging.log(accessToken)
+                Logging.log(`Access Token -> ${accessToken}`)
                 reply.send({accessToken: accessToken})
             } else {
                 Logging.warn(`${email} does not exist/password wrong`);
@@ -70,7 +75,7 @@ export default class User {
                         }
                     })
                     if (updatedUserPassword) {
-                        Logging.log(`---successfully updated password for ${id}---`)
+                        Logging.log(`Successfully updated password for ${id}`)
                         reply.status(201).send(updatedUserPassword)
                     } else {
                         Logging.warn("update password unsuccessful")
@@ -97,7 +102,7 @@ export default class User {
                     }
                 })
                 if (updatedUsername) {
-                    Logging.log(`successfully updated username to ${username}`)
+                    Logging.log(`Successfully updated username to ${username}`)
                     reply.send(updatedUsername)
                 } else {
                     Logging.warn("update username unsuccessful");
@@ -110,10 +115,9 @@ export default class User {
 
     // deleting in order of foreign key constraints 
     public static deleteUser = async (req: FastifyRequest<{}>, reply: FastifyReply) => {
-  
         try {
             if (isUserObject(req.user)) {
-                const id = req.user.id;
+                const id = req.user.id
                 const deleteReviews = prisma.reviews.deleteMany({
                     where: {
                         userId: id
@@ -135,7 +139,7 @@ export default class User {
                     }
                 })
                 await prisma.$transaction([deleteReviews, deleteFollowing, deleteFollowers, deleteUser])
-                Logging.log(`successfully deleted all tracers of ${id}`)
+                Logging.log(`Successfully deleted all tracers of ${id}`)
             }
 
         } catch (error) {
@@ -157,9 +161,6 @@ export default class User {
         }
     }
 
-    public static follow = async () => {
-
-    }
 
 
     public static RESET = async () => {

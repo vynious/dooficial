@@ -3,7 +3,7 @@ import User from "../controllers/UserController";
 import { $ref } from "../schemas/UserSchema";
 
 export async function UserRoutes (Application: FastifyInstance)  {
-    // Application.get("/", )
+    // url : http://localhost:3001/api/user/
     Application.post("/register", 
     {   schema: {
         body: $ref("UserCreationSchema"),
@@ -47,6 +47,14 @@ export async function UserRoutes (Application: FastifyInstance)  {
             200: $ref("UserCoreSchema")
         }
     }}, User.updateUsername)
+
+
+    Application.post("/:id/profile/delete",
+    {   preHandler: [Application.authenticate],
+        schema: {
+            body: $ref("UserLoginSchema")
+        }
+    }, User.deleteUser)
 
 
    

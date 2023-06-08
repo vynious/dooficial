@@ -29,7 +29,7 @@ export async function UserRoutes (Application: FastifyInstance)  {
         }
     }, User.getUser)
 
-    Application.post("/password/update", 
+    Application.patch("/password/update", 
     {   preHandler: [Application.authenticate],
         schema: {
         body: $ref("PasswordSchema"),
@@ -39,7 +39,7 @@ export async function UserRoutes (Application: FastifyInstance)  {
     }}, User.updatePassword)
 
 
-    Application.post("/:id/username/update",
+    Application.patch("/username/update",
     {   preHandler: [Application.authenticate],
         schema: {
         body: $ref("UsernameSchema"),
@@ -49,11 +49,8 @@ export async function UserRoutes (Application: FastifyInstance)  {
     }}, User.updateUsername)
 
 
-    Application.post("/:id/profile/delete",
+    Application.delete("/profile/delete",
     {   preHandler: [Application.authenticate],
-        schema: {
-            body: $ref("UserLoginSchema")
-        }
     }, User.deleteUser)
 
 

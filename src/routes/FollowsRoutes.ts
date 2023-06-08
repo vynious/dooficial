@@ -7,5 +7,8 @@ export async function FollowsRoutes (Application: FastifyInstance) {
     {   preHandler: [Application.authenticate],
     }, Follows.followUser)
 
+    Application.delete("/:id/unfollow", 
+    {   preHandler: [Application.authenticate],
+    }, Follows.unfollowUser)
 
 }

@@ -1,62 +1,68 @@
 import { PrismaClient } from "@prisma/client";
 import { FastifyReply, FastifyRequest } from "fastify";
-import { IRestaurant, IReview, PReview, PUser, PUserXRest, PUsername } from "../types/ModelTypes";
+import { isUserObject } from "../types/ModelTypes";
+import { ReviewInput } from "../schemas/ReviewSchema";
+import Logging from "../utils/Logging";
+import { RestaurantInput } from "../schemas/RestaurantSchema";
+// add on missing schemas
 
 const prisma = new PrismaClient();
 
 export default class Review {
     
     // write a review
-    public static writeReview = async (req: FastifyRequest <{Params: PUser, Body: PReview}>, reply: FastifyReply) => {
+    public static writeReview = async (req: FastifyRequest <{Body: ReviewInput}>, reply: FastifyReply) => {
         try {
-            const {userId} = req.params
-            const {restaurantId, ratings, description} = req.body
-            const review: IReview = await prisma.reviews.create({data: {
-                userId: userId,
-                restaurantId: restaurantId,
-                ratings: ratings,
-                description: description,
-            }})
-            console.log("successfully wrote a review -> ", review);
+            if (isUserObject(req.user)) {
+                const userId = req.user.id;
+                const {restaurantId, ratings, description} = req.body
+                const review = await prisma.reviews.create({data: {
+                    userId: userId,
+                    restaurantId: restaurantId,
+                    ratings: ratings,
+                    description: description,
+                }})
+                Logging.log(`successfully wrote a review -> ${review}`);
+            }
         } catch (error) {
-            console.log(error)
+            Logging.error(error)
         }
        
     }
 
 
     // filter reviews by users in cronological order
-    public static displayReviewsByTarget = async (req: FastifyRequest<{Body: PUsername}>, reply: FastifyReply) => {
+    public static displayReviewsByTarget = async (req: FastifyRequest<{}>, reply: FastifyReply) => {
         
         try {
-            const {username} =  req.body;
-            const reviews: IReview[] | null = await prisma.reviews.findMany({
-                where: {
-                    user: {
-                        username: username
+            if (isUserObject(req.user)) {
+                const userId = req.user.id
+                const reviews = await prisma.reviews.findMany({
+                    where: {
+                        id: userId
+                    },
+                    orderBy: {
+                        datetime: "desc"  
                     }
-                },
-                orderBy: {
-                    datetime: "desc"  
+                });
+                if (reviews) {
+                    Logging.log(`these are the reviews by`)
+                } else {
+                    Logging.warn("user has not written any reviews")
                 }
-            });
-            if (reviews) {
-                console.log(`these are the reviews by`)
-            } else {
-                console.log("user has not written any reviews")
             }
         } catch (error) {
-            console.log(error)
+            Logging.error(error)
         }
 
     }
 
 
     // filter reviews by restaurant name & location in cronological order
-    public static displayReviewsByRestaurant = async (req: FastifyRequest<{Body: IRestaurant}>, reply: FastifyReply) => {
+    public static displayReviewsByRestaurant = async (req: FastifyRequest<{Body: RestaurantInput}>, reply: FastifyReply) => {
         try {
             const {name, location} = req.body;
-            const reviews: IReview[] | null = await prisma.reviews.findMany({
+            const reviews= await prisma.reviews.findMany({
                 where: {
                     restaurant: {
                         name: name,
@@ -68,37 +74,46 @@ export default class Review {
                 }
             });
             if (reviews) {
-                console.log(`these are the reviews for ${name} located at ${location}`)
+                Logging.log(`these are the reviews for ${name} located at ${location}`)
             } else {
-                console.log("restaurant has no reviews")
+                Logging.warn("restaurant has no reviews")
             }
         } catch (error) {
-            console.log(error)
+            Logging.error(error)
         }
         
     }
 
     // can pack these 2 variables into {} object then unpack later one
     // takes in the userId & restaurantId to find specific review for deletion
-    public static deleteReview = async (req: FastifyRequest<{Params: PUserXRest}>, reply: FastifyReply) => {
-        
+    public static deleteReview = async (req: FastifyRequest<{Body: RestaurantInput}>, reply: FastifyReply) => {
         try {
-            const {userId , restaurantId} = req.params;
-            const reviewForDelete: IReview|null = await prisma.reviews.delete({
-                where: {
-                    userId_restaurantId: {
-                        userId: userId,
-                        restaurantId: restaurantId
+            if (isUserObject(req.user)) {
+                const userId = req.user.id
+                const {name, location} = req.body;
+                const restaurant = await prisma.restaurant.findUnique({
+                    where: {
+                        name_location: {name: name, location: location}
                     }
-                }
-            });
-            if (reviewForDelete) {
-                console.log("review successfully deleted")
-            } else {
-                console.log("cannot find specific review")
+                })
+                if (restaurant) {
+                    const reviewForDelete = await prisma.reviews.delete({
+                        where: {
+                            userId_restaurantId: {userId: userId, restaurantId: restaurant.id}
+    
+                        }
+                    });
+                    if (reviewForDelete) {
+                        Logging.log("review successfully deleted")
+                    } else {
+                        Logging.warn("cannot find specific review")
+                    }
+                } else {
+                    Logging.warn("restaurant does not exists")
+                }   
             }
         } catch (error) {
-            console.log(error)
+            Logging.error(error)
         }
     }
 

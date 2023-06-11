@@ -7,7 +7,7 @@ import fastifyjwt from "@fastify/jwt";
 import { isUserObject } from "./types/ModelTypes";
 import Logging from "./utils/Logging";
 import { FollowsRoutes } from "./routes/FollowsRoutes";
-
+import { ReviewSchemas } from "./schemas/ReviewSchema";
 
 dotenv.config();
 
@@ -25,7 +25,7 @@ declare module "fastify" {
 const buildServer = async () => {
 
     // adding schema to server
-    for (const schema of [...UserSchemas]) {
+    for (const schema of [...UserSchemas, ...ReviewSchemas]) {
         Application.addSchema(schema);
       }
     if (SECRET_KEY) {

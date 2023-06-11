@@ -19,12 +19,10 @@ export default class Follows {
                         id: id
                     }
                 });
-
                 const follow = await prisma.follows.create({ data: {
                     userId: currentUser.id,
                     friendId: id
                 }});
-                
                 if (targetId && follow) {
                     Logging.info(`new following -> ${follow}`);
                     Logging.info(`${currentUser.name} followed ${targetId.name}`)
@@ -52,13 +50,11 @@ export default class Follows {
                             userId_friendId: {userId: currentUser.id, friendId: id}
                         }
                     })
-
                     if (unfollow && targetId) {
                         Logging.info(`new unfollowing -> ${unfollow}`);
                         Logging.info(`${currentUser.name} unfollowed ${targetId.name}`)
                     }
                 }
-
             } catch (error) {
                 Logging.error(error)
             }

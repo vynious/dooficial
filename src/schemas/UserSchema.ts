@@ -60,8 +60,6 @@ const UserLoginResponseSchema = z.object({
     accessToken: z.string()
 })
 
-///
-
 // used as interface for type casting user's inputs in req.body/params 
 export type CreateUserInput = z.infer<typeof UserCreationSchema>
 export type UserLoginInput = z.infer<typeof UserLoginSchema>
@@ -83,4 +81,4 @@ export const {schemas: UserSchemas, $ref } = buildJsonSchemas({
     UserLoginSchema,
     UserSchema,
     UserLoginResponseSchema
-})
+}, {$id: "UserSchema"})

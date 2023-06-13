@@ -8,10 +8,13 @@ import { isUserObject } from "./types/ModelTypes";
 import Logging from "./utils/Logging";
 import { FollowsRoutes } from "./routes/FollowsRoutes";
 import { ReviewSchemas } from "./schemas/ReviewSchema";
+import { nearbyFoodOptions } from "utils/GooglePlaces";
+import { RestaurantRoutes } from "./routes/RestaurantRoutes";
+
 
 dotenv.config();
 
-export const Application = fastify({logger: true});
+export const Application = fastify({logger: true, trustProxy: true});
 const PORT: number|undefined = Number(process.env.PORT);
 const SECRET_KEY: string|undefined = process.env.SECRET_KEY 
 
@@ -25,9 +28,10 @@ declare module "fastify" {
 const buildServer = async () => {
 
     // adding schema to server
-    for (const schema of [...UserSchemas, ...ReviewSchemas]) {
+    for (const schema of [...UserSchemas,...ReviewSchemas]) {
         Application.addSchema(schema);
-      }
+    }
+
     if (SECRET_KEY) {
         Application.register(fastifyjwt, {
             secret: SECRET_KEY,
@@ -51,9 +55,13 @@ const buildServer = async () => {
     Application.register(FollowsRoutes, {prefix: "api/follows"})
     Application.register(UserRoutes, {prefix: "api/user"});
     Application.register(ReviewRoutes, {prefix: "api/review"});
+    Application.register(RestaurantRoutes, {prefix: "api/restaurant"})
 
-    Application.get("/", (req, res) => {
-        res.send({greetings: "Hello"});
+    Application.get("/", async (req, res) => {
+        try {
+        } catch (error) {
+
+        }
     });
 }
 

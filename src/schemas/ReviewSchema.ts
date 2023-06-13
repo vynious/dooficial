@@ -25,4 +25,4 @@ export const {schemas: ReviewSchemas, $ref} = buildJsonSchemas({
     DescriptionSchema,
     RatingSchema,
     ReviewSchema
-})
+}, {$id: "ReviewSchema"})

@@ -84,18 +84,18 @@ export default class Review {
         
     }
 
-    // can pack these 2 variables into {} object then unpack later one
-    // takes in the userId & restaurantId to find specific review for deletion
+
     public static deleteReview = async (req: FastifyRequest<{Body: RestaurantInput}>, reply: FastifyReply) => {
         try {
             if (isUserObject(req.user)) {
                 const userId = req.user.id
                 const {name, location} = req.body;
+                // get restaurant based on store + location
                 const restaurant = await prisma.restaurant.findUnique({
                     where: {
                         name_location: {name: name, location: location}
                     }
-                })
+                }) 
                 if (restaurant) {
                     const reviewForDelete = await prisma.reviews.delete({
                         where: {

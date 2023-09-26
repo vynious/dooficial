@@ -26,3 +26,6 @@
 - Stay Connected: Easily keep track of your friends' food adventures with a dedicated section showcasing their recent food posts.
 - Build Your Foodie Community: Expand your network of food-loving friends.
 
+## Tech Stack 
+- Backend : Node.js/TypeScript with Fastify
+- Database : PostgreSQL with PrismaORM
